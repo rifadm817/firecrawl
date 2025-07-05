@@ -8,10 +8,10 @@ COPY . /app
 WORKDIR /app
 
 FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+RUN --mount=type=cache,id=pnpm-cache,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
 FROM base AS build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install && pnpm run build
+RUN --mount=type=cache,id=pnpm-cache,target=/pnpm/store pnpm install && pnpm run build
 
 # Install Go
 FROM golang:1.24 AS go-base
@@ -54,4 +54,4 @@ EXPOSE 8080
 # Make sure the entrypoint script has the correct line endings
 RUN sed -i 's/\r$//' /app/docker-entrypoint.sh
 
-ENTRYPOINT "/app/docker-entrypoint.sh"
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
